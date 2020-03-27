@@ -9,7 +9,7 @@
       <v-row>
         <v-col class="col-12">
           <v-card>
-            <v-date-picker v-model="date" full-width></v-date-picker>
+            <v-date-picker v-model="date" full-width locale="es-sp" :min="minimum" :max="maximum"></v-date-picker>
           </v-card>
           <v-card color="error" dark>
             <v-card-text class="display-1 text-center">
@@ -27,7 +27,9 @@ export default {
   name: "Home",
   data() {
     return {
-      date: ""
+      date: "",
+      minimum: "1999",
+      maximum: new Date().toISOString().substr(0,10)
     };
   }
 };
