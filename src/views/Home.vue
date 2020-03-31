@@ -20,7 +20,7 @@
           </v-card>
           <v-card color="error" dark>
             <v-card-text class="display-1 text-center">
-              {{ value }}€: {{ date }}
+              {{ value }}{{ typeof value === "number" ? "€" : "" }}
             </v-card-text>
           </v-card>
         </v-col>
@@ -31,6 +31,7 @@
 
 <script>
 import axios from "axios";
+import { mapMutations } from 'vuex';
 
 export default {
   name: "Home",
@@ -43,13 +44,27 @@ export default {
     };
   },
   methods: {
+    ...mapMutations(['showLoading', 'hideLoading']),
     async getDolar(date) {
-      let sortedDay = date.split('-').reverse().join('-')
-      console.log('SORTED DAY: ', sortedDay)
-      console.log("AXIOS: ", axios);
-      let data = await axios.get(`https://mindicador.cl/api/euro/${sortedDay}`);
-      console.log("DATA: ", data.data.serie[0].valor);
-      this.value = await data.data.serie[0].valor;
+      let sortedDay = date
+        .split("-")
+        .reverse()
+        .join("-");
+      try {
+        this.showLoading({ title: 'Getting info...', color: 'secondary' })
+        let data = await axios.get(
+          `https://mindicador.cl/api/euro/${sortedDay}`
+        );
+
+        data.data.serie.length > 0
+          ? (this.value = await data.data.serie[0].valor)
+          : (this.value = "No info on weekend");
+      } catch (err) {
+        console.log(err);
+      } finally {
+        console.log('finally')
+        this.hideLoading()
+      }
     }
   },
   created() {
